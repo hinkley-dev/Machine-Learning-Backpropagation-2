@@ -49,10 +49,9 @@ const Vec& NeuralNet::predict(const Vec& in)
 
     layerInputs.copy(layers[i]->getActivation());
     startWeight += layers[i]->getWeightCount();
-    activation.copy(layers[i]->getActivation());
   }
 
-  return activation;
+  return layers[layers.size() -1]->getActivation();
 }
 
 void NeuralNet::backprop(const Vec& targetVals)

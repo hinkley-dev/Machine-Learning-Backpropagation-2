@@ -33,7 +33,6 @@ void LayerLinear::activate(const Vec& weights,const Vec& x)
    Matrix M(m_outputs, m_inputs);
 
 
-
   size_t matrixIndex = m_outputs -1;
 
   //Matricies will read the weights by rows

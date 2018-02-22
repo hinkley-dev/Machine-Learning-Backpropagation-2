@@ -17,7 +17,6 @@ class NeuralNet : public SupervisedLearner
 
 private:
   Vec weights;
-  Vec activation;
   vector<Layer*> layers;
   Vec gradient;
   Rand random;

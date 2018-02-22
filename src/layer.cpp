@@ -16,7 +16,7 @@ Layer::~Layer()
 
 }
 
-Vec Layer::getActivation()
+const Vec& Layer::getActivation()
 {
   return activation;
 }

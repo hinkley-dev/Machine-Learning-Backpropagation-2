@@ -20,7 +20,7 @@ public:
 
 	Layer(size_t inputs, size_t outputs, Rand r);
 	Layer(size_t inputs, Rand r);
-	Vec getActivation();
+	const Vec& getActivation();
 	void setBlame(Vec& _blame);
 	size_t getWeightCount();
 

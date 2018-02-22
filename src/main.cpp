@@ -33,22 +33,15 @@ void testLearner(SupervisedLearner& learner)
 
 }
 
-Vec convertToOneHot(size_t in)
-{
-	Vec oneHot(10);
-	oneHot.fill(0);
-	oneHot[in] = 1;
-	return oneHot;
-}
 
-size_t convertToDecimal(Vec& oneHot)
+size_t convertToDecimal(const Vec& oneHot)
 {
 	return oneHot.indexOfMax();
 }
 
 void testMNIST(Rand random)
 {
-	cout << "loading data" << endl;
+	cout << "start loading data" << endl;
 	//load data
 	string fn = "data/";
 	Matrix testFeats;
@@ -89,36 +82,36 @@ void testMNIST(Rand random)
 
 	nn.init_weights();
 
-
-	//training NeuralNet
 	double learning_rate = 0.03;
-	size_t itr = 7;
+	size_t itr = 15;
 
 	size_t trainingDataCount = trainFeats.rows();
 
-	size_t *randomIndicies= new size_t[trainingDataCount]();
+	//to shuffle the data
+	size_t *randomIndicies= new size_t[trainingDataCount];
 	for(size_t j = 0; j < trainingDataCount; ++j)
 	{
 		randomIndicies[j] = j;
 	}
 
+	Vec onehot(10);
+	onehot.fill(0.0);
 	//epochs
 	for(size_t i = 0 ; i < itr; ++i)
 	{
 		//create random indexes
+		//random_shuffle(begin(*randomIndicies), end(*randomIndicies));
 
 		cout << "itr: " << i << " is starting refinement." << endl;
-		for(size_t k = 0; k < 3; ++k)
+		for(size_t j = 0; j < trainFeats.rows(); ++j)
 		{
-			random_shuffle(&randomIndicies[0], &randomIndicies[trainingDataCount-1]);
-			for(size_t j = 0; j < trainingDataCount; ++j)
-			{
-				size_t testRow = randomIndicies[j];
-				Vec oneHotLabel = convertToOneHot(trainLabs.row(testRow)[0]);
-				nn.refine_weights(trainFeats.row(testRow), oneHotLabel , learning_rate);
-			}
+			size_t trainRow = j;
+			//Vec oneHotLabel = convertToOneHot(trainLabs.row(testRow)[0]);
+			size_t digit = trainLabs.row(trainRow)[0];
+			onehot[digit] = 1.0;
+			nn.refine_weights(trainFeats.row(trainRow), onehot , learning_rate);
+			onehot[digit] = 0.0;
 		}
-
 		cout << "itr: " << i << " has completed refining." << endl;
 
 		//test after an epoch
@@ -126,14 +119,14 @@ void testMNIST(Rand random)
 		size_t misclassifications = 0;
 		for(size_t j = 0; j < testingDataCount; ++j)
 		{
-			Vec oneHotPrediction = nn.predict(testFeats.row(j));
+			const Vec& oneHotPrediction = nn.predict(testFeats.row(j));
 			size_t prediction = convertToDecimal(oneHotPrediction);
-			if(prediction != testLabs.row(j)[0])
+			if(prediction != (size_t)testLabs.row(j)[0])
 				misclassifications++;
 		}
 		cout << misclassifications <<" / " << testingDataCount << endl;
-		if(misclassifications < 350)
-			return;
+		// if(misclassifications < 350)
+		// 	return;
 	}
 
 	delete[] randomIndicies;
@@ -172,7 +165,7 @@ int main(int argc, char *argv[])
 		// {
 		// 	nn.refine_weights(in, target, 0.1);
 		// }
-		//nn.getWeights().print();
+		// nn.getWeights().print();
 		ret = 0;
 	}
 	catch(const std::exception& e)
