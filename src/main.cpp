@@ -25,91 +25,7 @@ using std::cerr;
 using std::string;
 using std::auto_ptr;
 
-void test(SupervisedLearner& learner, const char* challenge)
-{
-	// Load the training data
-	// string fn = "data/";
-	// fn += challenge;
-	// Matrix trainFeatures;
-	// trainFeatures.loadARFF(fn + "_train_feat.arff");
-	// Matrix trainLabels;
-	// trainLabels.loadARFF(fn + "_train_lab.arff");
-	//
-	// // Train the model
-	// learner.train(trainFeatures, trainLabels);
-	//
-	// // Load the test data
-	// Matrix testFeatures;
-	// testFeatures.loadARFF(fn + "_test_feat.arff");
-	// Matrix testLabels;
-	// testLabels.loadARFF(fn + "_test_lab.arff");
 
-	// Measure and report accuracy
-	// size_t misclassifications = learner.countMisclassifications(testFeatures, testLabels);
-	// cout << "Misclassifications by " << learner.name() << " at " << challenge << " = " << to_str(misclassifications) << "/" << to_str(testFeatures.rows()) << "\n";
-}
-
-void testHousingData(SupervisedLearner& learner)
-{
-	// Load the training data
-	string fn = "data/";
-	Matrix features;
-	features.loadARFF(fn + "housing_features.arff");
-	Matrix labels;
-	labels.loadARFF(fn + "housing_labels.arff");
-
-
-
-	learner.crossValidation(features, labels,5,10);
-
-	// Load the test data
-
-}
-
-void testNeuralNetWithOLS(Rand random)
-{
-	NeuralNet nn(random);
-
-	double learning_rate = 0.1;
-	size_t itr = 3;
-	nn.addLayerLinear(1,2);
-	nn.addLayerTanh(2);
-	nn.addLayerLinear(2,1);
-	nn.init_weights();
-	// double prevErr = 0;
-	// size_t good = 0;
-
-
-
-	// size_t *randomIndicies= new size_t[dataCount];
-	// for(size_t j = 0; j < dataCount; ++j)
-	// {
-	// 	randomIndicies[j] = j;
-	// }
-
-	for(size_t i = 0 ; i < itr; ++i)
-	{
-		//double totalErr = 0;
-
-		//create random indexes
-		//random_shuffle(&randomIndicies[0], &randomIndicies[dataCount-1]);
-
-
-
-
-			Vec in(1);
-			in[0] = 0.3;
-			Vec target(1);
-			target[0] = 0.7;
-			nn.refine_weights(in, target, learning_rate);
-
-
-	}
-
-
-
-
-}
 
 void testLearner(SupervisedLearner& learner)
 {
@@ -152,7 +68,7 @@ void testMNIST(Rand random)
 	{
 		for(size_t col = 0 ; col < testFeats.cols(); ++col)
 		{
-			testFeats[row][col] = double(testFeats[row][col] / 256.0);
+			testFeats[row][col] = (testFeats[row][col] / 256.0);
 		}
 	}
 
@@ -160,7 +76,7 @@ void testMNIST(Rand random)
 	{
 		for(size_t col = 0 ; col < trainFeats.cols(); ++col)
 		{
-			trainFeats[row][col] = double(trainFeats[row][col] / 256.0);
+			trainFeats[row][col] = (trainFeats[row][col] / 256.0);
 		}
 	}
 
@@ -168,7 +84,6 @@ void testMNIST(Rand random)
 	nn.addLayerLinear(784,80);
 	nn.addLayerTanh(80);
 	nn.addLayerLinear(80,30);
-	nn.addLayerTanh(30);
 	nn.addLayerLinear(30,10);
 	nn.addLayerTanh(10);
 
@@ -176,7 +91,7 @@ void testMNIST(Rand random)
 
 
 	//training NeuralNet
-	double learning_rate = 0.003;
+	double learning_rate = 0.01;
 	size_t itr = 7;
 
 	size_t trainingDataCount = trainFeats.rows();
@@ -212,13 +127,13 @@ void testMNIST(Rand random)
 				misclassifications++;
 		}
 		cout << misclassifications <<" / " << testingDataCount << endl;
+		if(misclassifications < 350)
+			return;
 	}
 
 	delete[] randomIndicies;
 
 }
-
-
 
 
 int main(int argc, char *argv[])
@@ -238,10 +153,6 @@ int main(int argc, char *argv[])
 	}
 	try
 	{
-		//NeuralNet nn(random);
-		//testHousingData(nn);
-		//testNeuralNetWithOLS(random);
-
 		testMNIST(random);
 		ret = 0;
 	}

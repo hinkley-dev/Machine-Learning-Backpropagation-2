@@ -146,7 +146,7 @@ void NeuralNet::refine_weights(const Vec& in, const Vec& targetVals, double lear
 {
 
   gradient.fill(0.0);
-  Vec p = predict(in);
+  predict(in);
   backprop(targetVals);
   update_gradient(in);
 
