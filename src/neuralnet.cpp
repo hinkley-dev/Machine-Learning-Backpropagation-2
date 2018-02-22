@@ -139,6 +139,7 @@ void NeuralNet::init_weights()
 
   }
   if(startWeight != weights.size()) throw Ex("Error, not all weights initialized");
+  //weights.copy({0.1, 0.2, 0.3, 0.4, 0.1, 0.2, 0.3});
 
 }
 

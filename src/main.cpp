@@ -91,7 +91,7 @@ void testMNIST(Rand random)
 
 
 	//training NeuralNet
-	double learning_rate = 0.01;
+	double learning_rate = 0.03;
 	size_t itr = 7;
 
 	size_t trainingDataCount = trainFeats.rows();
@@ -106,14 +106,19 @@ void testMNIST(Rand random)
 	for(size_t i = 0 ; i < itr; ++i)
 	{
 		//create random indexes
-		random_shuffle(&randomIndicies[0], &randomIndicies[trainingDataCount-1]);
+
 		cout << "itr: " << i << " is starting refinement." << endl;
-		for(size_t j = 0; j < trainingDataCount; ++j)
+		for(size_t k = 0; k < 3; ++k)
 		{
-			size_t testRow = randomIndicies[j];
-			Vec oneHotLabel = convertToOneHot(trainLabs.row(testRow)[0]);
-			nn.refine_weights(trainFeats.row(testRow), oneHotLabel , learning_rate);
+			random_shuffle(&randomIndicies[0], &randomIndicies[trainingDataCount-1]);
+			for(size_t j = 0; j < trainingDataCount; ++j)
+			{
+				size_t testRow = randomIndicies[j];
+				Vec oneHotLabel = convertToOneHot(trainLabs.row(testRow)[0]);
+				nn.refine_weights(trainFeats.row(testRow), oneHotLabel , learning_rate);
+			}
 		}
+
 		cout << "itr: " << i << " has completed refining." << endl;
 
 		//test after an epoch
@@ -153,7 +158,21 @@ int main(int argc, char *argv[])
 	}
 	try
 	{
-		testMNIST(random);
+		 testMNIST(random);
+		// NeuralNet nn(random);
+		// nn.addLayerLinear(1,2);
+		// nn.addLayerTanh(2);
+		// nn.addLayerLinear(2,1);
+		// nn.init_weights();
+		// Vec in(1);
+		// Vec target(1);
+		// in[0] = 0.3;
+		// target[0] = 0.7;
+		// for(size_t i = 0; i < 3; ++i)
+		// {
+		// 	nn.refine_weights(in, target, 0.1);
+		// }
+		//nn.getWeights().print();
 		ret = 0;
 	}
 	catch(const std::exception& e)
