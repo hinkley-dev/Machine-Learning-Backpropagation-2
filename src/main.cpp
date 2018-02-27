@@ -73,17 +73,22 @@ void testMNIST(Rand random)
 		}
 	}
 
+	if(trainLabs.rows() != trainFeats.rows() || testLabs.rows() != testFeats.rows())
+		throw Ex("invalid data in MNIST upload");
+
 	NeuralNet nn(random);
 	nn.addLayerLinear(784,80);
 	nn.addLayerTanh(80);
 	nn.addLayerLinear(80,30);
+
+	nn.addLayerTanh(30);
 	nn.addLayerLinear(30,10);
 	nn.addLayerTanh(10);
 
 	nn.init_weights();
 
 	double learning_rate = 0.03;
-	size_t itr = 15;
+	size_t itr = 7;
 
 	size_t trainingDataCount = trainFeats.rows();
 
@@ -94,24 +99,29 @@ void testMNIST(Rand random)
 		randomIndicies[j] = j;
 	}
 
+
+
 	Vec onehot(10);
 	onehot.fill(0.0);
 	//epochs
 	for(size_t i = 0 ; i < itr; ++i)
 	{
 		//create random indexes
-		//random_shuffle(begin(*randomIndicies), end(*randomIndicies));
+		random_shuffle(&randomIndicies[0],&randomIndicies[trainingDataCount]);
+
 
 		cout << "itr: " << i << " is starting refinement." << endl;
-		for(size_t j = 0; j < trainFeats.rows(); ++j)
-		{
-			size_t trainRow = j;
-			//Vec oneHotLabel = convertToOneHot(trainLabs.row(testRow)[0]);
-			size_t digit = trainLabs.row(trainRow)[0];
-			onehot[digit] = 1.0;
-			nn.refine_weights(trainFeats.row(trainRow), onehot , learning_rate);
-			onehot[digit] = 0.0;
-		}
+
+			for(size_t j = 0; j < trainingDataCount*3; ++j)
+			{
+				size_t trainRow = random.next(trainingDataCount);
+				size_t digit = trainLabs.row(trainRow)[0];
+				onehot[digit] = 1.0;
+				nn.refine_weights(trainFeats.row(trainRow), onehot , learning_rate);
+				onehot[digit] = 0.0;
+			}
+
+
 		cout << "itr: " << i << " has completed refining." << endl;
 
 		//test after an epoch
@@ -131,12 +141,13 @@ void testMNIST(Rand random)
 
 	delete[] randomIndicies;
 
+
 }
 
 
 int main(int argc, char *argv[])
 {
-	Rand random(123);
+	Rand random(12);
 	enableFloatingPointExceptions();
 	int ret = 1;
 	try
@@ -151,7 +162,8 @@ int main(int argc, char *argv[])
 	}
 	try
 	{
-		 testMNIST(random);
+		//cout << 325 << endl;
+		testMNIST(random);
 		// NeuralNet nn(random);
 		// nn.addLayerLinear(1,2);
 		// nn.addLayerTanh(2);

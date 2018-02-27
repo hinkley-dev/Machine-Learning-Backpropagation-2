@@ -17,10 +17,14 @@ void LayerTanh::ordinary_least_squares(const Matrix& X,const Matrix& Y, Vec& wei
 
 void LayerTanh::activate(const Vec& weights,const Vec& x)
 {
-  for(size_t i = 0; i < x.size(); ++i)
-  {
-    activation[i] = tanh(x[i]);
-  }
+  for(size_t i = 0; i < activation.size(); i++)
+	{
+		if(x[i] >= 700.0)
+			activation[i] = 1.0;
+		else if(x[i] < -700.0)
+			activation[i] = -1.0;
+		else activation[i] = tanh(x[i]);
+	}
   // cout << endl;
   // cout << "In LayerTanh::activate " <<endl;
   // cout << "input vector: ";

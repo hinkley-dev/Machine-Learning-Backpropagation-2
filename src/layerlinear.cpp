@@ -30,44 +30,18 @@ void LayerLinear::activate(const Vec& weights,const Vec& x)
 
    VecWrapper b(*(Vec*)&weights, 0, m_outputs);
 
-   Matrix M(m_outputs, m_inputs);
+
+  size_t matrixIndex = m_outputs;
+
+ 
 
 
-  size_t matrixIndex = m_outputs -1;
-
-  //Matricies will read the weights by rows
   for(size_t i = 0; i < m_outputs; ++i)
   {
-    for(size_t j = 0; j < m_inputs; ++j)
-    {
-      matrixIndex++;
-      M[i][j] = weights[matrixIndex];
-    }
+    VecWrapper weightsRow(*(Vec*)&weights, matrixIndex, m_inputs);
+    activation[i] = x.dotProduct(weightsRow) + b[i];
+    matrixIndex +=weightsRow.size();
   }
-
-  //making x into a matrix to test it out
-  Matrix X(m_inputs,1);
-  for(size_t i = 0; i < m_inputs; ++i)
-  {
-    X[i][0] = x[i];
-  }
-
-
-  Vec& Mx = Matrix::multiply(M,X, false,false)->transpose()->row(0);
-  Vec y = Mx + b;
-  activation.copy(y);
-
-  // cout << endl;
-  // cout << "In LayerLinear::activate " <<endl;
-  // cout << "input vector: ";
-  // x.print();
-  // cout << endl;
-  // cout << "Weights: ";
-  // weights.print();
-  // cout << endl;
-  // cout << "computed activation: ";
-  // activation.print();
-  // cout << endl;
 
 }
 
@@ -113,6 +87,7 @@ void LayerLinear::backprop(const Vec& weights, Vec& prevBlame)
 
 
   delete PrevBlame;
+  PrevBlame = NULL;
 
 
     // cout << endl;
@@ -208,9 +183,13 @@ void LayerLinear::ordinary_least_squares(const Matrix& X,const Matrix& Y, Vec& w
 
 
     delete term1;
+    term1 = NULL;
     delete term2;
+    term2 = NULL;
     delete M;
+    M = NULL;
     delete Mx;
+    Mx = NULL;
 
 
 }

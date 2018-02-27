@@ -101,6 +101,8 @@ void NeuralNet::update_gradient(const Vec& x)
   //this is where uninitialized value was created
   //Conditional jump or move depends on uninitialised value(s)
   //that happens in tanh function aparently
+  if(&x == nullptr) throw Ex("input to update gradient is null");
+  if(x.size() == 0) throw Ex("input is not the right size");
   Vec in(x);
   size_t startGradient = 0;
 
